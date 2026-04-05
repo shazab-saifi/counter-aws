@@ -1,9 +1,13 @@
+import cors from "cors"
 import express, { type NextFunction, type Request, type Response } from "express"
 import jwt, { type JwtPayload } from "jsonwebtoken"
 import { prisma } from "@repo/db"
 import bcrypt from "bcrypt"
 
 const app = express()
+app.use(cors({
+    origin: ["http://localhost:3000", "http://127.0.0.1:3000"]
+}))
 app.use(express.json())
 
 declare global {
@@ -57,12 +61,8 @@ app.post("/signup", async (req: Request, res: Response) => {
         const user = await prisma.user.create({data: { username, password: hashedPassword}})
 
         if (!user) throw new Error("Something went wrong :(")
-        
-        const token = jwt.sign({
-            userId: user.id
-        }, process.env.JWT_SECRET!)
-
-        res.json({ msg: "Signed Up Successfully!", token })
+    
+        res.json({ msg: "Signed Up Successfully!" })
     } catch (error) {
         res.status(500).json({ msg: { error: "Internal server error, please try again later!" } })
         console.log("Error in signup endpoint", error)
