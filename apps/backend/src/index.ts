@@ -9,7 +9,7 @@ app.use(express.json())
 declare global {
     namespace Express {
         interface Request {
-            user?: JwtPayload | { userId: string };
+            user?: JwtPayload | { userId: string, iat: number };
         }
     }
 }
@@ -30,12 +30,11 @@ function authMiddleWare(req: Request, res: Response, next: NextFunction) {
             return
         }
 
-        req.user = JSON.parse(decoded as string)
+        req.user = decoded as JwtPayload
         next();
     } catch (error) {
         res.status(500).json({ msg: { error: "Internal server error, please try again later!" } })
         console.log("Error in middleware", error)
-        return
     }
 }
 
@@ -48,7 +47,7 @@ app.post("/signup", async (req: Request, res: Response) => {
     }
 
     try {
-        const existingUser = await prisma.user.findFirst({ where: { username } })
+        const existingUser = await prisma.user.findUnique({ where: { username } })
 
         if (existingUser) {
             res.status(409).json({ msg: { error: "User with this username already exits!" } })
@@ -67,7 +66,6 @@ app.post("/signup", async (req: Request, res: Response) => {
     } catch (error) {
         res.status(500).json({ msg: { error: "Internal server error, please try again later!" } })
         console.log("Error in signup endpoint", error)
-        return
     }
 })
 
@@ -80,7 +78,7 @@ app.post("/signin", async (req: Request, res: Response) => {
     }
     
     try {
-        const existingUser = await prisma.user.findFirst({ where: { username } })
+        const existingUser = await prisma.user.findUnique({ where: { username } })
 
         if (!existingUser) {
             res.status(409).json({ msg: { error: "Invalid credentials" } })
@@ -101,7 +99,27 @@ app.post("/signin", async (req: Request, res: Response) => {
     } catch (error) {
         res.status(500).json({ msg: { error: "Internal server error, please try again later!" } })
         console.log("Error in signin endpoint", error)
-        return
+    }
+})
+
+app.get("/", authMiddleWare, async (req: Request, res: Response) => {
+    const user = req.user
+
+    try {
+        const userData = await prisma.user.findUnique({ where: { id: user?.userId} })
+
+        if (!userData) {
+            res.status(403).json({ msg: { error: "User not found :(" } })
+            return
+        }
+
+        res.json({
+            userId: userData.id,
+            username: userData.username
+        })
+    } catch (error) {
+        res.status(500).json({ msg: { error: "Internal server error, please try again later!" } })
+        console.log("Error in / endpoint", error)
     }
 })
 
