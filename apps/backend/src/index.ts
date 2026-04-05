@@ -9,7 +9,7 @@ app.use(express.json())
 declare global {
     namespace Express {
         interface Request {
-            user?: JwtPayload | { username: string };
+            user?: JwtPayload | { userId: string };
         }
     }
 }
@@ -60,13 +60,47 @@ app.post("/signup", async (req: Request, res: Response) => {
         if (!user) throw new Error("Something went wrong :(")
         
         const token = jwt.sign({
-            userid: user.id
+            userId: user.id
         }, process.env.JWT_SECRET!)
 
-        res.json({ msg: "User created successfully!", token })
+        res.json({ msg: "Signed Up Successfully!", token })
     } catch (error) {
         res.status(500).json({ msg: { error: "Internal server error, please try again later!" } })
         console.log("Error in signup endpoint", error)
+        return
+    }
+})
+
+app.post("/signin", async (req: Request, res: Response) => {
+    const { username, password } = req.body
+
+    if (!username || !password) {
+        res.status(401).json({ msg: { error: "username and password are needed for signin!" } })
+        return
+    }
+    
+    try {
+        const existingUser = await prisma.user.findFirst({ where: { username } })
+
+        if (!existingUser) {
+            res.status(409).json({ msg: { error: "Invalid credentials" } })
+            return
+        }
+
+        const isRightPassword = bcrypt.compareSync(password, existingUser.password);
+        if (!isRightPassword) {
+            res.status(409).json({ msg: { error: "Invalid credentials" } })
+            return
+        }
+
+        const token = jwt.sign({
+            userId: existingUser?.id
+        }, process.env.JWT_SECRET!)
+
+        res.json({ msg: "Signed In Successfully!", token })
+    } catch (error) {
+        res.status(500).json({ msg: { error: "Internal server error, please try again later!" } })
+        console.log("Error in signin endpoint", error)
         return
     }
 })
