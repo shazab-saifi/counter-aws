@@ -52,7 +52,7 @@ export default function SignUpPage() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-gray-900 px-6 py-12 text-slate-100">
-      <section className="w-full max-w-md rounded-[2rem] border border-gray-700 bg-gray-800/70 p-8 shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-10">
+      <section className="w-full max-w-md rounded-4xl border border-gray-700 bg-gray-800/70 p-8 shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-10">
         <div className="space-y-6">
           <div className="space-y-3 text-center">
             <p className="text-sm uppercase tracking-[0.4em] text-yellow-300/80">

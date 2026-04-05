@@ -48,17 +48,23 @@ export default function Home() {
   }, [isRunning]);
 
   useEffect(() => {
-    const token = window.localStorage.getItem("token");
-
-    if (!token) {
-      setIsSignedIn(false);
-      return;
-    }
-
-    setIsSignedIn(true);
     let isCancelled = false;
 
     const loadUser = async () => {
+      const token = window.localStorage.getItem("token");
+
+      if (!token) {
+        if (!isCancelled) {
+          setIsSignedIn(false);
+          setUsername(null);
+        }
+        return;
+      }
+
+      if (!isCancelled) {
+        setIsSignedIn(true);
+      }
+
       try {
         const response = await fetch("http://localhost:4000/", {
           headers: {
@@ -68,15 +74,22 @@ export default function Home() {
 
         const data = await response.json();
 
-        if (!response.ok || isCancelled) {
+        if (!response.ok) {
+          if (!isCancelled) {
+            setIsSignedIn(false);
+            setUsername(null);
+          }
           return;
         }
 
-        if (typeof data?.username === "string") {
-          setUsername(data.username);
+        if (isCancelled) {
+          return;
         }
+
+        setUsername(typeof data?.username === "string" ? data.username : null);
       } catch {
         if (!isCancelled) {
+          setIsSignedIn(false);
           setUsername(null);
         }
       }
