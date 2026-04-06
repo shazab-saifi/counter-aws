@@ -25,6 +25,7 @@ jobs:
           tags: sab2/counter-aws-backend:${{ github.sha }}
   
   deploy:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Deploy via SSH
@@ -34,7 +35,7 @@ jobs:
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            docker rm -f counter-aws-be || true &&
+            docker rm -f counter-aws-be
             docker run --name counter-aws-be \
               --restart unless-stopped \
               -e DATABASE_URL='${{ secrets.DATABASE_URL }}' \
