@@ -34,7 +34,7 @@ jobs:
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            docker rm -f counter-aws-be
+            docker rm -f counter-aws-be || true &&
             docker run --name counter-aws-be \
               --restart unless-stopped \
               -e DATABASE_URL='${{ secrets.DATABASE_URL }}' \
