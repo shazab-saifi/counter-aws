@@ -23,3 +23,21 @@ jobs:
           file: ./docker/Dockerfile.backend
           push: true
           tags: sab2/counter-aws-backend:${{ github.sha }}
+  
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.5
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            docker rm -f counter-aws-be
+            docker run --name counter-aws-be \
+              --restart unless-stopped \
+              -e DATABASE_URL='${{ secrets.DATABASE_URL }}' \
+              -e JWT_SECRET='${{ secrets.JWT_SECRET }}' \
+              -d -p 4000:4000 \
+              sab2/counter-aws-backend:${{ github.sha }}
