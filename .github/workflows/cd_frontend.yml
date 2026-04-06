@@ -23,3 +23,20 @@ jobs:
           file: ./docker/Dockerfile.frontend
           push: true
           tags: sab2/counter-aws-frontend:${{ github.sha }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.5
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            docker rm -f counter-aws-fe
+            docker run --name counter-aws-fe \
+              --restart unless-stopped \
+              -d -p 3000:3000 \
+              sab2/counter-aws-frontend:${{ github.sha }}
