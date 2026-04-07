@@ -35,6 +35,7 @@ jobs:
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            docker image prune -af
             docker rm -f counter-aws-be
             docker run --name counter-aws-be \
               --restart unless-stopped \
