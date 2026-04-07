@@ -66,7 +66,7 @@ export default function Home() {
       }
 
       try {
-        const response = await fetch("http://localhost:4000/", {
+        const response = await fetch("/", {
           headers: {
             Authorization: token,
           },
