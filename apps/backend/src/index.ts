@@ -5,9 +5,9 @@ import { prisma } from "@repo/db"
 import bcrypt from "bcrypt"
 
 const app = express()
-app.use(cors({
-    origin: ["https://counter.shazab.site", "https://counter.shazab.site"]
-}))
+// app.use(cors({
+//     origin: ["https://counter.shazab.site", "https://counter.shazab.site"]
+// }))
 app.use(express.json())
 
 declare global {
