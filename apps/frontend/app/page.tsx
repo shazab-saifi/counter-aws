@@ -66,7 +66,7 @@ export default function Home() {
       }
 
       try {
-        const response = await fetch("/", {
+        const response = await fetch("https://counter.shazab.site", {
           headers: {
             Authorization: token,
           },

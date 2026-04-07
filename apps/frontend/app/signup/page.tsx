@@ -19,7 +19,7 @@ export default function SignUpPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/api/signup", {
+      const response = await fetch("https://counter.shazab.site/api/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
