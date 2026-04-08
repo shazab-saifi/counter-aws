@@ -1,4 +1,4 @@
-import cors from "cors"
+// import cors from "cors"
 import express, { type NextFunction, type Request, type Response } from "express"
 import jwt, { type JwtPayload } from "jsonwebtoken"
 import { prisma } from "@repo/db"
@@ -42,7 +42,7 @@ function authMiddleWare(req: Request, res: Response, next: NextFunction) {
     }
 }
 
-app.post("/signup", async (req: Request, res: Response) => {
+app.post("/api/signup", async (req: Request, res: Response) => {
     const { username, password } = req.body
 
     if (!username || !password) {
@@ -69,7 +69,7 @@ app.post("/signup", async (req: Request, res: Response) => {
     }
 })
 
-app.post("/signin", async (req: Request, res: Response) => {
+app.post("/api/signin", async (req: Request, res: Response) => {
     const { username, password } = req.body
 
     if (!username || !password) {
@@ -102,7 +102,7 @@ app.post("/signin", async (req: Request, res: Response) => {
     }
 })
 
-app.get("/", authMiddleWare, async (req: Request, res: Response) => {
+app.get("/api", authMiddleWare, async (req: Request, res: Response) => {
     const user = req.user
 
     try {
